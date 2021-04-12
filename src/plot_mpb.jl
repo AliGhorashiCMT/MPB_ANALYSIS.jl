@@ -17,3 +17,8 @@ function plot_mpb(filename::String, mode::String, nbands::Int)
     #return Bands 
     return reshapedBands
 end
+
+function plot_bothmodes(filename::String, nbands::Int)
+    plot(plot_mpb(filename, "te", nbands), linewidth=5, color="red", legend=false, xticks=false)
+    plot!(plot_mpb(filename, "tm", nbands), linewidth=5, color="blue", legend=false, xticks=false, ylabel="Frequency")
+end
