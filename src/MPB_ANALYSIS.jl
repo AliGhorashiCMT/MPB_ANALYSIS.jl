@@ -6,7 +6,9 @@ using Plots
 include("plot_mpb.jl")
 export plot_mpb, plot_bothmodes
 
-greet() = print("Hello World!")
+include("plot_topologybands.jl")
+export plot_topologybands, plot_manytopologybands
 
+greet() = print("Hello World!")
 
 end # module
