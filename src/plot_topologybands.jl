@@ -1,4 +1,4 @@
-function plot_topologybands(filename::String)
+function plot_topologybands(filename::String, highsymmetrylabels::Array{<:AbstractString})
     Bands = Vector{Vector{Float64}}()
     try
         for line in readlines(filename)
@@ -14,6 +14,20 @@ function plot_topologybands(filename::String)
         reshapedBands[i, :] = Bands[i] ##Note that each row now corresponds to a point in reciprocal space, as desired
     end
     plot(reshapedBands, legend=false, xticks=false, size=(1000, 500), linestyle=:dash, color="pink", linewidth=5)
+    println(length(Bands))
+    highsymmetrygap = Int((length(Bands)-1)/(length(highsymmetrylabels)-1))
+    highsymmetryxcoords = collect(1:highsymmetrygap:length(Bands))
+    for (highsymmetrylabel, highsymmetryxcoord) in zip(highsymmetrylabels, highsymmetryxcoords)
+        irlabels = String.(split(replace(replace(highsymmetrylabel, "+" => " "), "," =>" ")        ))
+        for (energy, irreps) in zip(Bands[highsymmetryxcoord], irlabels)
+            display(annotate!(highsymmetryxcoord, energy, text(irreps, 10)))
+        end
+    end
+end
+
+function plot_topologybands(filename::String, highsymmetrylabels::String)
+    splitted_array_string = split.(replace(replace(replace(highsymmetrylabels, "["=>""), "]"=>""), ","=>" "))
+    plot_topologybands(filename, splitted_array_string)
 end
 
 function plot_manytopologybands(directory::String)
