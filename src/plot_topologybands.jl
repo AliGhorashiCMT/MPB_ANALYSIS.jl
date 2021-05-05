@@ -27,14 +27,25 @@ function plot_topologybands(filename::String, highsymmetrylabels::Array{<:Abstra
     
 end
 
+"""
+$(TYPEDSIGNATURES)
+"""
 function plot_topologybands(sgnum::Integer, id::Integer, runtype::String; dim::Integer=2, res::Integer=32, dispersiondir::String="./", symeigdir::String="./")
     dispersion_filename = mpb_calcname(dim, sgnum, id, res, runtype)*"-dispersion.out"
     symeig_filename = mpb_calcname(dim, sgnum, id, res, runtype)*"-symeigs.out"
     for line in readlines(dispersiondir*dispersion_filename)
-        println(parse.(Ref(Float64), string.(split(replace(line, "," => " "))))[6:end])
+        #println(parse.(Ref(Float64), string.(split(replace(line, "," => " "))))[6:end])
     end
     #Extract symmetry data 
-    
+    for line in readlines(symeigdir*symeig_filename)
+        #println(line)
+    end
+    bandirsd, lgirsd = extract_individual_multiplicities(mpb_calcname(dim, sgnum, id, res, runtype),
+                        timereversal=true, dir = symeigdir, atol=1e-3)
+    irlabs = Dict(klab => formatirreplabel.(label.(lgirs)) for (klab, lgirs) in lgirsd)
+
+    Dict(klab => [bands => irlabs[klab][iridx] for (bands, iridx) in bandirs] for (klab, bandirs) in bandirsd)
+
 end
 
 function plot_topologybands(filename::String, highsymmetrylabels::String)
