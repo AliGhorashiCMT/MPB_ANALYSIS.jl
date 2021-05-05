@@ -14,6 +14,7 @@ function plot_topologybands(filename::String, highsymmetrylabels::Array{<:Abstra
         reshapedBands[i, :] = Bands[i] ##Note that each row now corresponds to a point in reciprocal space, as desired
     end
     plot(reshapedBands, legend=false, xticks=false, size=(1000, 500), linestyle=:dash, color="pink", linewidth=5)
+    
     println(length(Bands))
     highsymmetrygap = Int((length(Bands)-1)/(length(highsymmetrylabels)-1))
     highsymmetryxcoords = collect(1:highsymmetrygap:length(Bands))
@@ -23,6 +24,17 @@ function plot_topologybands(filename::String, highsymmetrylabels::Array{<:Abstra
             display(annotate!(highsymmetryxcoord, energy, text(irreps, 10)))
         end
     end
+    
+end
+
+function plot_topologybands(sgnum::Integer, id::Integer, runtype::String; dim::Integer=2, res::Integer=32, dispersiondir::String="./", symeigdir::String="./")
+    dispersion_filename = mpb_calcname(dim, sgnum, id, res, runtype)*"-dispersion.out"
+    symeig_filename = mpb_calcname(dim, sgnum, id, res, runtype)*"-symeigs.out"
+    for line in readlines(dispersiondir*dispersion_filename)
+        println(parse.(Ref(Float64), string.(split(replace(line, "," => " "))))[6:end])
+    end
+    #Extract symmetry data 
+    
 end
 
 function plot_topologybands(filename::String, highsymmetrylabels::String)
