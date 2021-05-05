@@ -1,7 +1,7 @@
 module MPB_ANALYSIS
 
 #Dependencies
-using Plots
+using Plots, MPBUtils, Crystalline
 
 include("plot_mpb.jl")
 export plot_mpb, plot_bothmodes
