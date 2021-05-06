@@ -28,9 +28,10 @@ end
 """
 $(TYPEDSIGNATURES)
 """
-function plot_topologybands(sgnum::Integer, id::Integer, runtype::String; dim::Integer=2, res::Integer=32, dispersiondir::String="./", symeigdir::String="./")
+function plot_topologybands(sgnum::Integer, id::Integer, runtype::String; dim::Integer=2, res::Integer=32, dispersiondir::String="./", symeigdir::String="./", kwargs...)
     dispersion_filename = mpb_calcname(dim, sgnum, id, res, runtype)*"-dispersion.out"
     symeig_filename = mpb_calcname(dim, sgnum, id, res, runtype)*"-symeigs.out"
+    println(dispersion_filename)
     athighsymmetry = Vector{Integer}()
     highsymmetrykvecs = bandreps(sgnum, dim).kvs
     highsymmetryklabs = bandreps(sgnum, dim).klabs
@@ -47,7 +48,7 @@ function plot_topologybands(sgnum::Integer, id::Integer, runtype::String; dim::I
     for i in 1:length(Bands)
         reshapedBands[i, :] = Bands[i] ##Note that each row now corresponds to a point in reciprocal space, as desired
     end
-    display(plot(reshapedBands, linewidth=5, legend=false,  size=(1000, 500), xtickfontsize=20))
+    display(plot(reshapedBands, linewidth=5, legend=false,  size=(1000, 500), xtickfontsize=20; kwargs...))
     for (index, line) in enumerate(readlines(dispersiondir*dispersion_filename))
         lab = index in athighsymmetry ? highsymmetryklabs[findfirst(x -> isapprox(x.cnst, parse.(Ref(Float64), string.(split(replace(line, "," => " "))))[2:2+dim-1], atol=1e-3), highsymmetrykvecs )] : nothing
         !isnothing(lab) && (push!(xticks, index); push!(xticklabels, lab)) #isplay(annotate!(index, 0, text(lab)))
