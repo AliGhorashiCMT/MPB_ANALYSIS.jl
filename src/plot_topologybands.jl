@@ -31,7 +31,6 @@ $(TYPEDSIGNATURES)
 function plot_topologybands(sgnum::Integer, id::Integer, runtype::String; dim::Integer=2, res::Integer=32, dispersiondir::String="./", symeigdir::String="./", kwargs...)
     dispersion_filename = mpb_calcname(dim, sgnum, id, res, runtype)*"-dispersion.out"
     symeig_filename = mpb_calcname(dim, sgnum, id, res, runtype)*"-symeigs.out"
-    println(dispersion_filename)
     athighsymmetry = Vector{Integer}()
     highsymmetrykvecs = bandreps(sgnum, dim).kvs
     highsymmetryklabs = bandreps(sgnum, dim).klabs
