@@ -40,7 +40,6 @@ function plot_topologybands(sgnum::Integer, id::Integer, runtype::String; dim::I
     Bands = Vector{Vector{Float64}}()
     for (index, line) in enumerate(readlines(dispersiondir*dispersion_filename))
         push!(Bands, parse.(Ref(Float64), string.(split(replace(line, "," => " "))))[6:end])
-        #println(parse.(Ref(Float64), string.(split(replace(line, "," => " "))))[2:2+dim-1])
         sum([isapprox(parse.(Ref(Float64), string.(split(replace(line, "," => " "))))[2:2+dim-1] , highsymmetrykvec.cnst, atol=1e-3) for highsymmetrykvec in highsymmetrykvecs]) == 1 && push!(athighsymmetry, index )
     end
     println(athighsymmetry)
@@ -57,8 +56,7 @@ function plot_topologybands(sgnum::Integer, id::Integer, runtype::String; dim::I
     bandirsd, lgirsd = extract_individual_multiplicities(mpb_calcname(dim, sgnum, id, res, runtype),
     timereversal=true, dir = symeigdir, atol=1e-1, latestarts= Dict{String,Int}())
     irlabs = Dict(klab => formatirreplabel.(label.(lgirs)) for (klab, lgirs) in lgirsd)
-    labeldict = Dict(klab => [bands => irlabs[klab][iridx] for (bands, iridx) in bandirs] for (klab, bandirs) in bandirsd)
-    println(labeldict)
+    labeldict = Dict(klab => [bands => symvec2string(n, irlabs[klab]; braces=false) for (bands, n) in bandirs]         for (klab, bandirs) in bandirsd)
     for (tick, label) in zip(xticks, xticklabels)
         groupings = labeldict[label]
         for x in groupings
