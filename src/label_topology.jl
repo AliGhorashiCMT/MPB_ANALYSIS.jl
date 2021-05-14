@@ -1,3 +1,7 @@
+"""
+$(TYPEDSIGNATURES)
+
+"""
 function label_topologies(calcname::String, has_tr::Bool=true, dir="./")
     sgnum = MPBUtils.parse_sgnum(calcname)
     D = MPBUtils.parse_dim(calcname)
@@ -9,9 +13,8 @@ function label_topologies(calcname::String, has_tr::Bool=true, dir="./")
 
     println(mode)
     bandirsd, lgirsd =  mode == "tm" ? extract_individual_multiplicities(calcname, timereversal=has_tr, dir = dir, atol=2e-2) : extract_individual_multiplicities(calcname, timereversal=has_tr, latestarts = Dict{String, Int}(), dir = dir,atol=2e-2)
-    mode == "tm" && pushfirst!(bandirsd["Γ"], 1:1=>[1, zeros(length(get_lgirreps(sgnum, D)["Γ"])-1)...])
+    mode == "tm" && pushfirst!(bandirsd["Γ"], 1:1=>[1, zeros(length(realify(get_lgirreps(sgnum, D)["Γ"]))-1)...])
     bands, nds = collect_separable(bandirsd, lgirsd, latestarts = Dict{String, Int}())
-    #bands, nds = mode == "tm" ? collect_separable(bandirsd, lgirsd) : collect_separable(bandirsd, lgirsd, latestarts = Dict{String, Int}())
 
     isempty(bands) && error("   ... found no isolable band candidates ...")
     permd = Dict(klab => Vector{Int}(undef, length(lgirsd[klab])) for klab in sb.klabs)
