@@ -2,18 +2,18 @@ function label_topologies(calcname::String, has_tr::Bool=true, dir="./")
     sgnum = MPBUtils.parse_sgnum(calcname)
     D = MPBUtils.parse_dim(calcname)
     sb, brs = compatibility_basis(sgnum, D)
+    mode = contains(calcname, "te") ? "te" : "tm"
     brsmat= matrix(brs, true)
     F = smith(brsmat)
-    bandirsd, lgirsd = extract_individual_multiplicities(
-                        calcname,
-                        timereversal=has_tr, latestarts = Dict{String, Int}(),
-                        dir = dir,
-                        atol=2e-2)
-    bands, nds = collect_separable(bandirsd, lgirsd, latestarts = Dict{String, Int}())
     nontopologicalbasis = nontopological_basis(F, brs)
-    bands, nds = collect_separable(bandirsd, lgirsd, latestarts = Dict{String, Int}(),)
+
+    println(mode)
+    bandirsd, lgirsd =  mode == "tm" ? extract_individual_multiplicities(calcname, timereversal=has_tr, dir = dir, atol=2e-2) : extract_individual_multiplicities(calcname, timereversal=has_tr, latestarts = Dict{String, Int}(), dir = dir,atol=2e-2)
+    mode == "tm" && pushfirst!(bandirsd["Γ"], 1:1=>[1, zeros(length(get_lgirreps(sgnum, D)["Γ"])-1)...])
+    bands, nds = collect_separable(bandirsd, lgirsd, latestarts = Dict{String, Int}())
+    #bands, nds = mode == "tm" ? collect_separable(bandirsd, lgirsd) : collect_separable(bandirsd, lgirsd, latestarts = Dict{String, Int}())
+
     isempty(bands) && error("   ... found no isolable band candidates ...")
-    println(sb.klabs)
     permd = Dict(klab => Vector{Int}(undef, length(lgirsd[klab])) for klab in sb.klabs)
     for klab in sb.klabs
         lgirs = lgirsd[klab]
@@ -34,6 +34,8 @@ function label_topologies(calcname::String, has_tr::Bool=true, dir="./")
         ns[b][end] = μ
     end
     minband = 1
+    println("bands: ", bands)
+    println("ns: ", ns)
     for (indx, band) in enumerate(bands)
         minimum(band) == minband || continue
         a, b = find_mintoposet(bands, ns, indx, F )
