@@ -14,6 +14,9 @@ export plot_topologybands, plot_manytopologybands
 include("analyze_symvecs.jl")
 export analyze_symvecs
 
+include("label_topology.jl")
+export label_topologies
+
 greet() = print("Hello World!")
 
 function __init__()
