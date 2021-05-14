@@ -49,6 +49,11 @@ function label_topologies(calcname::String, has_tr::Bool=true, dir="./")
     end
 end
 
+"""
+$(TYPEDSIGNATURES)
+
+Returns the minimum set of compatible bands starting form the index `idx`
+"""
 function find_mintoposet(bands::Vector{<:UnitRange{<:Integer}}, ns::Vector{<:Vector{<:Integer}}, idx::Integer, F::Smith{Int64,Array{Int64,2}})
     nprime = ns[idx]
     bandsprime = minimum(bands[idx]):maximum(bands[idx])
