@@ -45,6 +45,14 @@ git-tree-sha1 = "ecdec412a9abc8db54c0efc5548c64dfce072058"
 uuid = "b99e7846-7c00-51b0-8f62-c81ae34c0232"
 version = "0.5.10"
 
+[[Brillouin]]
+deps = ["DocStringExtensions", "LinearAlgebra", "PyCall", "Reexport", "Requires", "StaticArrays"]
+git-tree-sha1 = "950a4dacb9183febab579f60050fb691f5f9fd8c"
+repo-rev = "master"
+repo-url = "https://github.com/thchr/Brillouin.jl"
+uuid = "23470ee3-d0df-4052-8b1a-8cbd6363e7f0"
+version = "0.3.2"
+
 [[Bzip2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "c3598e525718abcc440f69cc6d5f60dda0a1b61e"

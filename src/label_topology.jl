@@ -13,6 +13,8 @@ function label_topologies(calcname::String, has_tr::Bool=true, dir="./")
 
     println(mode)
     bandirsd, lgirsd =  mode == "tm" ? extract_individual_multiplicities(calcname, timereversal=has_tr, dir = dir, atol=2e-2) : extract_individual_multiplicities(calcname, timereversal=has_tr, latestarts = Dict{String, Int}(), dir = dir,atol=2e-2)
+    # Make realify dependent on has_tr
+    # find_representation
     mode == "tm" && pushfirst!(bandirsd["Γ"], 1:1=>[1, zeros(length(realify(get_lgirreps(sgnum, D)["Γ"]))-1)...])
     bands, nds = collect_separable(bandirsd, lgirsd, latestarts = Dict{String, Int}())
 
@@ -45,6 +47,7 @@ function label_topologies(calcname::String, has_tr::Bool=true, dir="./")
         println(a, "   ", b)
         println(isbandstruct(b, F))
         println(calc_detailed_topology(b, nontopologicalbasis, brs)) 
+        #Make nothing return for last bands if not bandstruct
         minband = maximum(a) + 1
     end
 end
@@ -64,3 +67,5 @@ function find_mintoposet(bands::Vector{<:UnitRange{<:Integer}}, ns::Vector{<:Vec
     end
     return bandsprime, nprime
 end
+
+#
