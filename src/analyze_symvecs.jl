@@ -3,8 +3,6 @@ function analyze_symvecs(sgnum::Integer, D::Integer=2, id::Integer=1, res::Integ
     symeig_filename = mpb_calcname(D, sgnum, id, res, runtype)
     println(symeig_filename)
     symeigsd, lgirsd = read_symdata(symeig_filename, sgnum=sgnum, D=D, dir=symeigdir)
-    #println(symeigsd)
-    #println(symeigsd["Γ"])
     symvec1 = convert.(Integer, round.(MPBUtils.symeigs2irreps(symeigsd["Γ"], get_lgirreps(sgnum, D)["Γ"], 1:4), digits=3))
     symvec2 = convert.(Integer, round.(MPBUtils.symeigs2irreps(symeigsd["K"], get_lgirreps(sgnum, D)["K"], 1:4), digits=3))
     symvec3 = convert.(Integer, round.(MPBUtils.symeigs2irreps(symeigsd["M"], get_lgirreps(sgnum, D)["M"], 1:4), digits=3))
@@ -45,7 +43,7 @@ function analyze_symvecs(calcname::AbstractString; dir="./", has_tr::Bool = true
     end
 
     μs = length.(bands)
-    ns = [Vector{Int}(undef, length(first(symbasis))) for _ in 1:length(bands)]
+    ns = [Vector{Integer}(undef, length(first(symbasis))) for _ in 1:length(bands)]
     for (b, (nd, μ)) in enumerate(zip(nds, μs))
         for (klab, nᵏ) in nd
             permᵏ = permd[klab]

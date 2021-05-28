@@ -2,7 +2,7 @@
 $(TYPEDSIGNATURES)
 
 """
-function label_topologies(calcname::AbstractString, has_tr::Bool=true, dir="./"; printisbandstruct::Bool=false)
+function label_topologies(calcname::AbstractString, has_tr::Bool=true, dir="./"; printisbandstruct::Bool=true)
     sgnum = MPBUtils.parse_sgnum(calcname)
     D = MPBUtils.parse_dim(calcname)
     sb, brs = compatibility_basis(sgnum, D)
@@ -18,7 +18,7 @@ function label_topologies(calcname::AbstractString, has_tr::Bool=true, dir="./";
     mode == "tm" && pushfirst!(bandirsd["Γ"], 1:1=>[1, zeros(length(realify(get_lgirreps(sgnum, D)["Γ"]))-1)...])
     bands, nds = collect_separable(bandirsd, lgirsd, latestarts = Dict{String, Int}())
 
-    isempty(bands) && error("   ... found no isolable band candidates ...")
+    isempty(bands) && error("   ... found no isolatable band candidates ...")
     permd = Dict(klab => Vector{Int}(undef, length(lgirsd[klab])) for klab in sb.klabs)
     for klab in sb.klabs
         lgirs = lgirsd[klab]
@@ -30,7 +30,7 @@ function label_topologies(calcname::AbstractString, has_tr::Bool=true, dir="./";
         end
     end
     μs = length.(bands)
-    ns = [Vector{Int}(undef, length(first(sb))) for _ in 1:length(bands)]
+    ns = [Vector{Integer}(undef, length(first(sb))) for _ in 1:length(bands)]
     for (b, (nd, μ)) in enumerate(zip(nds, μs))
         for (klab, nᵏ) in nd
             permᵏ = permd[klab]
@@ -46,9 +46,9 @@ function label_topologies(calcname::AbstractString, has_tr::Bool=true, dir="./";
         minimum(band) == minband || continue
         a, b = find_mintoposet(bands, ns, indx, F )
         println(a, "   ", b)
-        printisbandstruct && println(isbandstruct(b, F))
-        println(calc_detailed_topology(b, nontopologicalbasis, brs)) 
-        push!(returnbands, [a, calc_detailed_topology(b, nontopologicalbasis, brs)])
+        #printisbandstruct && println(isbandstruct(b, F))
+        #println(calc_detailed_topology(b, nontopologicalbasis, brs)) 
+        !isnothing(b) && push!(returnbands, [a, calc_detailed_topology(b, nontopologicalbasis, brs)])
         #Make nothing return for last bands if not bandstruct
         minband = maximum(a) + 1
     end
@@ -68,7 +68,7 @@ function find_mintoposet(bands::Vector{<:UnitRange{<:Integer}}, ns::Vector{<:Vec
         nprime = nprime + n
         bandsprime = minimum(bands[idx]):maximum(band)
     end
-    return bandsprime, nprime
+    isbandstruct(nprime, F) ? (bandsprime, nprime) : (bandsprime, nothing)
 end
 
 #

@@ -1,4 +1,4 @@
-function plot_mpb(filename::String, mode::String, nbands::Int)
+function plot_mpb(filename::AbstractString, mode::AbstractString, nbands::Integer)
     Bands = Vector{Vector{Float64}}()
     for line in readlines(filename)
         if contains(line, mode*"freqs")
@@ -18,7 +18,7 @@ function plot_mpb(filename::String, mode::String, nbands::Int)
     return reshapedBands
 end
 
-function plot_bothmodes(filename::String, nbands::Int)
+function plot_bothmodes(filename::AbstractString, nbands::Integer)
     plot(plot_mpb(filename, "te", nbands), linewidth=5, color="red", legend=true, xticks=false, )
     plot!(plot_mpb(filename, "tm", nbands), linewidth=5, color="blue", legend=false, xticks=false, ylabel="Frequency", label = "TM FREQS")
 end
