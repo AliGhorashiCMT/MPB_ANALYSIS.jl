@@ -1,7 +1,6 @@
 module MPB_ANALYSIS
-
 #Dependencies
-using Pkg, Plots, MPBUtils, Crystalline, DocStringExtensions, SymmetryBases, Brillouin
+using Pkg, Plots, MPBUtils, Crystalline, DocStringExtensions, SymmetryBases#, Brillouin
 
 using Crystalline: formatirreplabel, symvec2string, label
 
@@ -17,7 +16,9 @@ export analyze_symvecs
 include("label_topology.jl")
 export label_topologies
 
-greet() = print("Hello World!")
+include("dispersionpaths.jl")
+
+export dispersionpaths
 
 function __init__()
     println("Running Init")

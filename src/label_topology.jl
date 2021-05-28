@@ -2,7 +2,7 @@
 $(TYPEDSIGNATURES)
 
 """
-function label_topologies(calcname::String, has_tr::Bool=true, dir="./")
+function label_topologies(calcname::AbstractString, has_tr::Bool=true, dir="./"; printisbandstruct::Bool=false)
     sgnum = MPBUtils.parse_sgnum(calcname)
     D = MPBUtils.parse_dim(calcname)
     sb, brs = compatibility_basis(sgnum, D)
@@ -41,15 +41,18 @@ function label_topologies(calcname::String, has_tr::Bool=true, dir="./")
     minband = 1
     println("bands: ", bands)
     println("ns: ", ns)
+    returnbands = []
     for (indx, band) in enumerate(bands)
         minimum(band) == minband || continue
         a, b = find_mintoposet(bands, ns, indx, F )
         println(a, "   ", b)
-        println(isbandstruct(b, F))
+        printisbandstruct && println(isbandstruct(b, F))
         println(calc_detailed_topology(b, nontopologicalbasis, brs)) 
+        push!(returnbands, [a, calc_detailed_topology(b, nontopologicalbasis, brs)])
         #Make nothing return for last bands if not bandstruct
         minband = maximum(a) + 1
     end
+    return returnbands
 end
 
 """

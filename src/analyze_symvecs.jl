@@ -1,4 +1,4 @@
-function analyze_symvecs(sgnum::Integer, D::Integer=2, id::Integer=1, res::Integer=32, runtype::String="te"; symeigdir::String="./")
+function analyze_symvecs(sgnum::Integer, D::Integer=2, id::Integer=1, res::Integer=32, runtype::AbstractString="te"; symeigdir::AbstractString="./")
     BRS = bandreps(sgnum, D)
     symeig_filename = mpb_calcname(D, sgnum, id, res, runtype)
     println(symeig_filename)
@@ -13,7 +13,7 @@ function analyze_symvecs(sgnum::Integer, D::Integer=2, id::Integer=1, res::Integ
     calc_topology(symvec, BRS)
 end
 
-function analyze_symvecs(calcname::String; dir="./", has_tr::Bool = true, checkfragile::Bool = true)
+function analyze_symvecs(calcname::AbstractString; dir="./", has_tr::Bool = true, checkfragile::Bool = true)
     sgnum = MPBUtils.parse_sgnum(calcname) 
     D = MPBUtils.parse_dim(calcname)
     D != 2 && error("Data must be in 2 dimensions")
