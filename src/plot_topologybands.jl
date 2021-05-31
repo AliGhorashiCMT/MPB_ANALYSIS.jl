@@ -25,12 +25,20 @@ function plot_topologybands(filename::AbstractString, highsymmetrylabels::Array{
     end
 end
 
+"""
+$(TYPEDSIGNATURES)
+Returns the band eigenvalues from a string corresponding to a line from an MPB output
+"""
 function parsebands(line::AbstractString)
     return parse.(Ref(Float64), string.(split(replace(line, "," => " "))))[6:end]
 end
 
+"""
+$(TYPEDSIGNATURES)
+Returns the kvector from a string corresponding to a line from an MPB output. 
+"""
 function parsekvec(line::AbstractString, dim::Integer=2)
-    return parse.(Ref(Float64), string.(split(replace(line, "," => " "))))[2:2+dim-1]
+    return parse.(Ref(Float64), string.(split(replace(line, "," => " "))))[2:2+dim-1] #Note that dimensionality of kvector is dependent on dimensionality of simulation
 end
 
 """
@@ -47,7 +55,6 @@ function plot_topologybands(sgnum::Integer, id::Integer, runtype::AbstractString
     xticks = Vector{Integer}()
     xticklabels = Vector{String}()
     Bands = Vector{Vector{Float64}}()
-    #Frag, Nontop, Top, Unknown = 1, 2, 3, 4
     Frag, Nontop, Top, Unknown = :Red, :Blue, :Black, :Pink
     whichtopologies = label_topologies(mpb_calcname(dim, sgnum, id, res, runtype), true, symeigdir)
     for (index, line) in enumerate(readlines(dispersiondir*dispersion_filename))
@@ -78,6 +85,8 @@ function plot_topologybands(sgnum::Integer, id::Integer, runtype::AbstractString
     #timereversal=true, dir = symeigdir, atol=1e-1, latestarts = Dict{String, Int}())
     has_tr = true
     bandirsd, lgirsd =  runtype == "tm" ? extract_individual_multiplicities(calcname, timereversal=has_tr, dir = symeigdir, atol=2e-2) : extract_individual_multiplicities(calcname, timereversal=has_tr, latestarts = Dict{String, Int}(), dir = symeigdir,atol=2e-2)
+    runtype == "tm" && pushfirst!(bandirsd["Γ"], 1:1=>[1, zeros(length(realify(get_lgirreps(sgnum, dim)["Γ"]))-1)...])
+
     # Make realify dependent on has_tr
     # find_representation
 

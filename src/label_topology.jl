@@ -2,7 +2,7 @@
 $(TYPEDSIGNATURES)
 
 """
-function label_topologies(calcname::AbstractString, has_tr::Bool=true, dir="./"; printisbandstruct::Bool=true)
+function label_topologies(calcname::AbstractString, has_tr::Bool=true, dir="./"; printisbandstruct::Bool=false)
     sgnum = MPBUtils.parse_sgnum(calcname)
     D = MPBUtils.parse_dim(calcname)
     sb, brs = compatibility_basis(sgnum, D)
@@ -10,12 +10,12 @@ function label_topologies(calcname::AbstractString, has_tr::Bool=true, dir="./";
     brsmat= matrix(brs, true)
     F = smith(brsmat)
     nontopologicalbasis = nontopological_basis(F, brs)
-
-    println(mode)
     bandirsd, lgirsd =  mode == "tm" ? extract_individual_multiplicities(calcname, timereversal=has_tr, dir = dir, atol=2e-2) : extract_individual_multiplicities(calcname, timereversal=has_tr, latestarts = Dict{String, Int}(), dir = dir,atol=2e-2)
-    # Make realify dependent on has_tr
-    # find_representation
-    mode == "tm" && pushfirst!(bandirsd["Γ"], 1:1=>[1, zeros(length(realify(get_lgirreps(sgnum, D)["Γ"]))-1)...])
+    if has_tr
+        mode == "tm" && pushfirst!(bandirsd["Γ"], 1:1=>[1, zeros(length(realify(get_lgirreps(sgnum, D)["Γ"]))-1)...])
+    else 
+        mode == "tm" && pushfirst!(bandirsd["Γ"], 1:1=>[1, zeros(length(get_lgirreps(sgnum, D)["Γ"])-1)...])
+    end
     bands, nds = collect_separable(bandirsd, lgirsd, latestarts = Dict{String, Int}())
 
     isempty(bands) && error("   ... found no isolatable band candidates ...")
@@ -46,10 +46,9 @@ function label_topologies(calcname::AbstractString, has_tr::Bool=true, dir="./";
         minimum(band) == minband || continue
         a, b = find_mintoposet(bands, ns, indx, F )
         println(a, "   ", b)
-        #printisbandstruct && println(isbandstruct(b, F))
+        printisbandstruct && println(isbandstruct(b, F))
         #println(calc_detailed_topology(b, nontopologicalbasis, brs)) 
         !isnothing(b) && push!(returnbands, [a, calc_detailed_topology(b, nontopologicalbasis, brs)])
-        #Make nothing return for last bands if not bandstruct
         minband = maximum(a) + 1
     end
     return returnbands

@@ -18,6 +18,8 @@ export label_topologies
 
 include("dispersionpaths.jl")
 
+include("spacegroup_analysis.jl")
+
 export dispersionpaths
 
 function __init__()
