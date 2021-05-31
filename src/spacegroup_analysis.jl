@@ -15,7 +15,7 @@ function findfragiles(sgnum::Integer, dir::AbstractString= "./symeigs/output/out
         println(file[1:end-12])
         #
         try 
-            (sum([x[2] for x in label_topologies(file[1:end-12], true, dir, printisbandstruct=true)] .== FRAGILE) >= 1) && (numfragiles +=1)
+            (sum([x[2] for x in label_topologies(file[1:end-12], true, dir, printisbandstruct=false, verbose=false)] .== FRAGILE) >= 1) && (numfragiles +=1)
         catch
         end
     end

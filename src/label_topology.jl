@@ -2,7 +2,7 @@
 $(TYPEDSIGNATURES)
 
 """
-function label_topologies(calcname::AbstractString, has_tr::Bool=true, dir="./"; printisbandstruct::Bool=false)
+function label_topologies(calcname::AbstractString, has_tr::Bool=true, dir="./"; verbose::Bool=false, printisbandstruct::Bool=false)
     sgnum = MPBUtils.parse_sgnum(calcname)
     D = MPBUtils.parse_dim(calcname)
     sb, brs = compatibility_basis(sgnum, D)
@@ -17,7 +17,6 @@ function label_topologies(calcname::AbstractString, has_tr::Bool=true, dir="./";
         mode == "tm" && pushfirst!(bandirsd["Γ"], 1:1=>[1, zeros(length(get_lgirreps(sgnum, D)["Γ"])-1)...])
     end
     bands, nds = collect_separable(bandirsd, lgirsd, latestarts = Dict{String, Int}())
-
     isempty(bands) && error("   ... found no isolatable band candidates ...")
     permd = Dict(klab => Vector{Int}(undef, length(lgirsd[klab])) for klab in sb.klabs)
     for klab in sb.klabs
@@ -39,13 +38,13 @@ function label_topologies(calcname::AbstractString, has_tr::Bool=true, dir="./";
         ns[b][end] = μ
     end
     minband = 1
-    println("bands: ", bands)
-    println("ns: ", ns)
+    verbose && println("bands: ", bands)
+    verbose && println("ns: ", ns)
     returnbands = []
     for (indx, band) in enumerate(bands)
         minimum(band) == minband || continue
         a, b = find_mintoposet(bands, ns, indx, F )
-        println(a, "   ", b)
+        verbose && println(a, "   ", b)
         printisbandstruct && println(isbandstruct(b, F))
         #println(calc_detailed_topology(b, nontopologicalbasis, brs)) 
         !isnothing(b) && push!(returnbands, [a, calc_detailed_topology(b, nontopologicalbasis, brs)])
