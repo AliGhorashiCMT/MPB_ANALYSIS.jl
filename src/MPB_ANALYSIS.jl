@@ -1,6 +1,6 @@
 module MPB_ANALYSIS
 #Dependencies
-using Pkg, Plots, MPBUtils, Crystalline, DocStringExtensions, SymmetryBases#, Brillouin
+using Pkg, Plots, MPBUtils, Crystalline, DocStringExtensions, SymmetryBases, PyPlot#, Brillouin
 
 using Crystalline: formatirreplabel, symvec2string, label
 
