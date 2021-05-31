@@ -19,6 +19,7 @@ export label_topologies
 include("dispersionpaths.jl")
 
 include("spacegroup_analysis.jl")
+export findfragiles
 
 export dispersionpaths
 
