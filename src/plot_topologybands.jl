@@ -47,7 +47,7 @@ $(TYPEDSIGNATURES)
 Plots MPB bands and overlays both the irreps and the topological nature of the bands by denoting the color.
 """
 function plot_topologybands(sgnum::Integer, id::Integer, runtype::AbstractString; dim::Integer=2, 
-    res::Integer=32, dispersiondir::String="./", symeigdir::AbstractString="./", labeltopology::Bool=false, kwargs...)
+    res::Integer=32, dispersiondir::String="./", symeigdir::AbstractString="./", labeltopology::Bool=false, verbose::Bool=false, kwargs...)
     whichtopologiesVEC = Symbol[] #A vector of symbols denoting the colors of each bands (corresponding to their topological classfication)
     dispersion_filename = mpb_calcname(dim, sgnum, id, res, runtype)*"-dispersion.out" 
     calcname = mpb_calcname(dim, sgnum, id, res, runtype)
@@ -59,7 +59,8 @@ function plot_topologybands(sgnum::Integer, id::Integer, runtype::AbstractString
     Bands = Vector{Vector{Float64}}()
     Frag, Nontop, Top, Unknown = :Red, :Blue, :Black, :Pink 
     println("Coloring scheme is: ", "Frgile: $(string(Frag)),  Nontopological: $(string(Nontop)),  Topological: $(string(Top)), and Unknown: $(string(Unknown))\n\n")
-    whichtopologies = label_topologies(mpb_calcname(dim, sgnum, id, res, runtype), true, symeigdir)
+    whichtopologies = label_topologies(mpb_calcname(dim, sgnum, id, res, runtype), true, symeigdir, verbose=verbose)
+    verbose && println(whichtopologies...)
     for (index, line) in enumerate(readlines(dispersiondir*dispersion_filename))
         push!(Bands, parsebands(line))
         sum([isapprox(parsekvec(line, dim), highsymmetrykvec.cnst, atol=1e-3) for highsymmetrykvec in highsymmetrykvecs]) == 1 && push!(athighsymmetry, index )
@@ -77,7 +78,7 @@ function plot_topologybands(sgnum::Integer, id::Integer, runtype::AbstractString
         reshapedBands[i, :] = b ##Note that each row now corresponds to a point in reciprocal space, as desired
         reshapedBandscolors[i, :] = whichtopologiesVEC
     end
-    bandsplot = plot(reshapedBands, color=reshapedBandscolors, linewidth=5, legend=false,  size=(500, 1000), xtickfontsize=20; kwargs...)
+    bandsplot = Plots.plot(reshapedBands, color=reshapedBandscolors, linewidth=5, legend=false,  size=(500, 1000), xtickfontsize=20; kwargs...)
     for (index, line) in enumerate(readlines(dispersiondir*dispersion_filename))
         lab = index in athighsymmetry ? highsymmetryklabs[findfirst(x -> isapprox(x.cnst, parsekvec(line, dim), atol=1e-3), highsymmetrykvecs )] : nothing
         !isnothing(lab) && (push!(xticks, index); push!(xticklabels, lab)) 

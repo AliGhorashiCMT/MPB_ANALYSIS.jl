@@ -4,6 +4,8 @@ using Pkg, Plots, MPBUtils, Crystalline, DocStringExtensions, SymmetryBases, PyP
 
 using Crystalline: formatirreplabel, symvec2string, label
 
+using MPBUtils: parse_dim, parse_sgnum
+
 include("plot_mpb.jl")
 export plot_mpb, plot_bothmodes
 
