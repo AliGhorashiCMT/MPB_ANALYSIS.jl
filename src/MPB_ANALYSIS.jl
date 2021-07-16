@@ -1,6 +1,6 @@
 module MPB_ANALYSIS
 #Dependencies
-using Pkg, Plots, MPBUtils, Crystalline, DocStringExtensions, SymmetryBases, PyPlot#, Brillouin
+using Pkg, Plots, MPBUtils, Crystalline, DocStringExtensions, SymmetryBases, PyPlot, DelimitedFiles#, Brillouin
 
 using Crystalline: formatirreplabel, symvec2string, label
 
@@ -22,6 +22,9 @@ include("dispersionpaths.jl")
 
 include("spacegroup_analysis.jl")
 export findfragiles
+
+include("Hoti.jl")
+export findpolarizations
 
 export dispersionpaths
 
