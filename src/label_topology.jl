@@ -35,6 +35,9 @@ function label_topologies(calcname::AbstractString, has_tr::Bool=true, dir="./";
             ns[b][permᵏ] .= nᵏ
         end
         ns[b][end] = μ
+        #= 
+        Feed to corner/polarization methods
+        =#
     end
     minband = 1
     verbose && println("bands: ", bands)

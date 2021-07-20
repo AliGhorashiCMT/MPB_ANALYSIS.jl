@@ -24,7 +24,7 @@ include("spacegroup_analysis.jl")
 export findfragiles
 
 include("Hoti.jl")
-export findpolarizations
+export findpolarizations, find_hoti
 
 export dispersionpaths
 
