@@ -67,14 +67,21 @@ function bulk_polarization_pg2(n::Vector{<:Integer}, irlabs::Vector{<:AbstractSt
     Y₁, Γ₁, A₁, B₁ = get_mult.(Ref(n), Ref(irlabs), ["Y₁", "Γ₁", "A₁", "B₁"])
     return [mod(Y₁-Γ₁ + A₁-Γ₁, 2)//2, mod(B₁-Γ₁ + A₁-Γ₁, 2)//2]
 end
+
 function bulk_polarization_pg10(n::Vector{<:Integer}, irlabs::Vector{<:AbstractString}) # plane group 10
     X₁, Γ₁, Γ₂ = get_mult.(Ref(n), Ref(irlabs), ["X₁", "Γ₁", "Γ₂"])
     P₁₂ = mod(X₁ - Γ₁ - Γ₂, 2)//2
     return [P₁₂, P₁₂]
 end
+
 function bulk_polarization_pg16(n::Vector{<:Integer}, irlabs::Vector{<:AbstractString})
     return [0//1, 0//1]
 end
+
+function bulk_polarization_pg16()
+    return [0//1, 0//1]
+end
+
 function bulk_polarization(n::Vector{<:Integer}, sb::SymBasis)
     irlabs = sb.irlabs
     pgnum  = sb.sgnum
@@ -86,16 +93,19 @@ end
 
 function corner_charge_pg2(n::Vector{<:Integer}, irlabs::Vector{<:AbstractString})
     Y₁, Γ₁, A₁, B₁ = get_mult.(Ref(n), Ref(irlabs), ["Y₁", "Γ₁", "A₁", "B₁"])
-    return mod((B₁-Γ₁) - (Y₁-Γ₁) + (A₁-Γ₁), 2) // 2
+    return mod((B₁-Γ₁) - (Y₁-Γ₁) + (A₁-Γ₁), 2) // 4
 end
+
 function corner_charge_pg10(n::Vector{<:Integer}, irlabs::Vector{<:AbstractString})
     X₁, Γ₁, Γ₂, Γ₃Γ₄, M₁, M₃ = get_mult.(Ref(n), Ref(irlabs), ["X₁", "Γ₁", "Γ₂", "Γ₃Γ₄", "M₁", "M₃M₄"])
     return mod((X₁-Γ₁-Γ₂) + 2(M₁-Γ₁) + 3(M₃-Γ₃Γ₄), 4) // 4
 end
+
 function corner_charge_pg16(n::Vector{<:Integer}, irlabs::Vector{<:AbstractString})
     M₁, K₁, Γ₁, Γ₂, Γ₃Γ₅ = get_mult.(Ref(n), Ref(irlabs), ["M₁", "K₁", "Γ₁", "Γ₂", "Γ₃Γ₅"])
     return mod(6*(M₁-Γ₁-Γ₃Γ₅) + 4*(K₁-Γ₁-Γ₂), 24) // 24
 end
+
 function corner_charge(n::Vector{<:Integer}, sb::SymBasis)
     irlabs = sb.irlabs
     pgnum  = sb.sgnum
@@ -121,7 +131,6 @@ function find_hoti(calcname::AbstractString, has_tr::Bool=true, dir="./"; verbos
     mode = contains(calcname, "te") ? "te" : "tm"
     brsmat= matrix(brs, true)
     F = smith(brsmat)
-    nontopologicalbasis = nontopological_basis(F, brs)
     bandirsd, lgirsd = mode == "tm" ? extract_individual_multiplicities(calcname, timereversal=has_tr, dir = dir, atol=2e-2) : extract_individual_multiplicities(calcname, timereversal=has_tr, latestarts = Dict{String, Int}(), dir = dir,atol=2e-2)
     if has_tr
         mode == "tm" && pushfirst!(bandirsd["Γ"], 1:1=>[1, zeros(length(realify(get_lgirreps(sgnum, D)["Γ"]))-1)...])
@@ -149,8 +158,29 @@ function find_hoti(calcname::AbstractString, has_tr::Bool=true, dir="./"; verbos
         end
         ns[b][end] = μ
     end
+    #=
     println(typeof(sb))
     println(length(ns))
     println(bands)
-    return bulk_polarization.(ns, Ref(sb)), corner_charge.(ns, Ref(sb))
+    =#
+    polarizations = bulk_polarization.(ns, Ref(sb))
+    corner_charges = corner_charge.(ns, Ref(sb))
+    []
+    return bands, [float.(pol) for pol in polarizations], [float.(charge) for charge in corner_charges]
+end
+
+function find_hoti_bands(calcname::AbstractString)
+    b, p, q = find_hoti(calcname)
+    relevant_bands1 = (iszero).(p)
+    relevant_bands2 = (!iszero).(q)
+    relevant_bands = relevant_bands1 .& relevant_bands2
+    return b[relevant_bands], p[relevant_bands], q[relevant_bands]
+end
+
+function extract_gaps(calcname::AbstractString, whichgap::Tuple{<:Integer, <:Integer}=(1, 2))
+    #By default we look at the fundamental gap, though this can be modified by changing whichgap
+    band1, band2 = whichgap
+    bandsathighk = [parse.(Float64, split(line, ","))[6:end] for line in readlines(calcname)]
+    gaps = [bands[band2]-bands[band1] for bands in bandsathighk]
+    return minimum(gaps)
 end
