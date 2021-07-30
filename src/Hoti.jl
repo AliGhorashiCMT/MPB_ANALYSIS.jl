@@ -165,7 +165,6 @@ function find_hoti(calcname::AbstractString, has_tr::Bool=true, dir="./"; verbos
     =#
     polarizations = bulk_polarization.(ns, Ref(sb))
     corner_charges = corner_charge.(ns, Ref(sb))
-    []
     return bands, [float.(pol) for pol in polarizations], [float.(charge) for charge in corner_charges]
 end
 
@@ -181,6 +180,10 @@ function extract_gaps(calcname::AbstractString, whichgap::Tuple{<:Integer, <:Int
     #By default we look at the fundamental gap, though this can be modified by changing whichgap
     band1, band2 = whichgap
     bandsathighk = [parse.(Float64, split(line, ","))[6:end] for line in readlines(calcname)]
-    gaps = [bands[band2]-bands[band1] for bands in bandsathighk]
-    return minimum(gaps)
+    #println(bandsathighk)
+    min_band2 = minimum([bands[band2] for bands in bandsathighk])
+    #println(min_band2)
+    max_band1 = maximum([bands[band1] for bands in bandsathighk])
+
+    return min_band2-max_band1
 end

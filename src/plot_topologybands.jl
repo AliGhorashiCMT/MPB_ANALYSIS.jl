@@ -58,7 +58,7 @@ function plot_topologybands(sgnum::Integer, id::Integer, runtype::AbstractString
     xticklabels = Vector{String}()
     Bands = Vector{Vector{Float64}}()
     Frag, Nontop, Top, Unknown = :Red, :Blue, :Black, :Pink 
-    println("Coloring scheme is: ", "Frgile: $(string(Frag)),  Nontopological: $(string(Nontop)),  Topological: $(string(Top)), and Unknown: $(string(Unknown))\n\n")
+    println("Coloring scheme is: ", "Fragile: $(string(Frag)),  Nontopological: $(string(Nontop)),  Topological: $(string(Top)), and Unknown: $(string(Unknown))\n\n")
     whichtopologies = label_topologies(mpb_calcname(dim, sgnum, id, res, runtype), true, symeigdir, verbose=verbose)
     verbose && println(whichtopologies...)
     for (index, line) in enumerate(readlines(dispersiondir*dispersion_filename))
