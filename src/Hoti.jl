@@ -93,7 +93,7 @@ end
 
 function corner_charge_pg2(n::Vector{<:Integer}, irlabs::Vector{<:AbstractString})
     Y₁, Γ₁, A₁, B₁ = get_mult.(Ref(n), Ref(irlabs), ["Y₁", "Γ₁", "A₁", "B₁"])
-    return mod((B₁-Γ₁) - (Y₁-Γ₁) + (A₁-Γ₁), 2) // 4
+    return mod(-(B₁-Γ₁) - (Y₁-Γ₁) + (A₁-Γ₁), 2) // 4
 end
 
 function corner_charge_pg10(n::Vector{<:Integer}, irlabs::Vector{<:AbstractString})
