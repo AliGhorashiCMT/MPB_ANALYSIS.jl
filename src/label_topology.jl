@@ -6,9 +6,6 @@ function label_topologies(calcname::AbstractString, has_tr::Bool=true, dir="./";
     D = parse_dim(calcname)
     sb, brs = compatibility_basis(sgnum, D)
     mode = contains(calcname, "te") ? "te" : "tm"
-    brsmat= matrix(brs, true)
-    F = smith(brsmat)
-    nontopologicalbasis = nontopological_basis(F, brs)
     bandirsd, lgirsd = mode == "tm" ? extract_individual_multiplicities(calcname, timereversal=has_tr, dir = dir, atol=2e-2) : extract_individual_multiplicities(calcname, timereversal=has_tr, latestarts = Dict{String, Int}(), dir = dir,atol=2e-2)
     if has_tr
         mode == "tm" && pushfirst!(bandirsd["Γ"], 1:1=>[1, zeros(length(realify(get_lgirreps(sgnum, D)["Γ"]))-1)...])
@@ -35,9 +32,6 @@ function label_topologies(calcname::AbstractString, has_tr::Bool=true, dir="./";
             ns[b][permᵏ] .= nᵏ
         end
         ns[b][end] = μ
-        #= 
-        Feed to corner/polarization methods
-        =#
     end
     minband = 1
     verbose && println("bands: ", bands)
@@ -48,7 +42,7 @@ function label_topologies(calcname::AbstractString, has_tr::Bool=true, dir="./";
         a, b = find_mintoposet(bands, ns, indx, F )
         verbose && println(a, "   ", b)
         printisbandstruct && println(isbandstruct(b, F))
-        !isnothing(b) && push!(returnbands, [a, calc_detailed_topology(b, nontopologicalbasis, brs)])
+        !isnothing(b) && push!(returnbands, [a, calc_detailed_topology(b, brs)])
         minband = maximum(a) + 1
     end
     return returnbands
