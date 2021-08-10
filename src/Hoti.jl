@@ -158,6 +158,7 @@ function find_hoti(calcname::AbstractString, has_tr::Bool=true, dir="./"; verbos
         end
         ns[b][end] = μ
     end
+    println(ns)
     #=
     println(typeof(sb))
     println(length(ns))
