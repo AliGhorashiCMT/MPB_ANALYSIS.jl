@@ -124,7 +124,7 @@ end
 """
 $(TYPEDSIGNATURES)
 """
-function find_hoti(calcname::AbstractString, has_tr::Bool=true, dir="./"; verbose::Bool=false, printisbandstruct::Bool=false)
+function find_hoti(calcname::AbstractString, has_tr::Bool=true, dir="./")
     sgnum = parse_sgnum(calcname)
     D = parse_dim(calcname)
     sb, brs = compatibility_basis(sgnum, D)
@@ -159,11 +159,6 @@ function find_hoti(calcname::AbstractString, has_tr::Bool=true, dir="./"; verbos
         ns[b][end] = μ
     end
     println(ns)
-    #=
-    println(typeof(sb))
-    println(length(ns))
-    println(bands)
-    =#
     polarizations = bulk_polarization.(ns, Ref(sb))
     corner_charges = corner_charge.(ns, Ref(sb))
     return bands, [float.(pol) for pol in polarizations], [float.(charge) for charge in corner_charges]
@@ -187,4 +182,21 @@ function extract_gaps(calcname::AbstractString, whichgap::Tuple{<:Integer, <:Int
     max_band1 = maximum([bands[band1] for bands in bandsathighk])
 
     return min_band2-max_band1
+end
+
+
+"""
+$(TYPEDSIGNATURES)
+
+Labels the topology and the charge
+"""
+function label_topology_and_hoti(calcname::AbstractString)
+
+    topologies_and_sets = label_topologies(calcname, true, "./", printisbandstruct=false, verbose=true)
+    hoti_charges = find_hoti(calcname)[3]
+    for (i, (s, t)) in enumerate(topologies_and_sets[1:end-1])
+        #println(extract_gaps(calcname*"-dispersion.out", (s[end],topologies_and_sets[i+1][1][1]) ))
+    end
+
+    return [[tands..., c ] for (tands, c) in zip(topologies_and_sets, hoti_charges)]
 end

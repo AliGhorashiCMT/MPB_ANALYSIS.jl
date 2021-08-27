@@ -1,11 +1,15 @@
 """
 $(TYPEDSIGNATURES)
+
+Returns the topological, trivial, and fragile bands
 """
 function label_topologies(calcname::AbstractString, has_tr::Bool=true, dir="./"; verbose::Bool=false, printisbandstruct::Bool=false)
     sgnum = parse_sgnum(calcname)
     D = parse_dim(calcname)
     sb, brs = compatibility_basis(sgnum, D)
     mode = contains(calcname, "te") ? "te" : "tm"
+    brsmat= matrix(brs, true)
+    F = smith(brsmat)
     bandirsd, lgirsd = mode == "tm" ? extract_individual_multiplicities(calcname, timereversal=has_tr, dir = dir, atol=2e-2) : extract_individual_multiplicities(calcname, timereversal=has_tr, latestarts = Dict{String, Int}(), dir = dir,atol=2e-2)
     if has_tr
         mode == "tm" && pushfirst!(bandirsd["Γ"], 1:1=>[1, zeros(length(realify(get_lgirreps(sgnum, D)["Γ"]))-1)...])
