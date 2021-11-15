@@ -1,6 +1,6 @@
 module MPB_ANALYSIS
 #Dependencies
-using Pkg, MPBUtils, Crystalline, DocStringExtensions, SymmetryBases, PyPlot, DelimitedFiles#, Brillouin
+using Pkg, MPBUtils, Crystalline, DocStringExtensions, SymmetryBases, PyPlot, PyCall, DelimitedFiles#, Brillouin
 using Crystalline: formatirreplabel, symvec2string, label
 using MPBUtils: parse_dim, parse_sgnum
 
@@ -28,6 +28,7 @@ export dispersionpaths
 
 function __init__()
     println("Running Init")
+    # The Python environment should be linked to pynormaliz for symmetry calculations. 
     #ENV["PYTHON"]="/usr/local/bin/python3"
 	#Pkg.build("PyCall")
 end
