@@ -14,7 +14,6 @@ function plot_mpb(filename::AbstractString, mode::AbstractString, nbands::Intege
     for k in 1:numkpoints
        reshapedBands[k, :] = Bands[k]
     end
-    #return Bands 
     return reshapedBands
 end
 

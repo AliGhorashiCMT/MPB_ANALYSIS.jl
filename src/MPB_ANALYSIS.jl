@@ -1,9 +1,7 @@
 module MPB_ANALYSIS
 #Dependencies
-using Pkg, Plots, MPBUtils, Crystalline, DocStringExtensions, SymmetryBases, PyPlot, DelimitedFiles#, Brillouin
-
+using Pkg, MPBUtils, Crystalline, DocStringExtensions, SymmetryBases, PyPlot, DelimitedFiles#, Brillouin
 using Crystalline: formatirreplabel, symvec2string, label
-
 using MPBUtils: parse_dim, parse_sgnum
 
 include("plot_mpb.jl")
