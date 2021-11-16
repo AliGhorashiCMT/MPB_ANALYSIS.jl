@@ -68,4 +68,3 @@ function find_mintoposet(bands::Vector{<:UnitRange{<:Integer}}, ns::Vector{<:Vec
     isbandstruct(nprime, F) ? (bandsprime, nprime) : (bandsprime, nothing)
 end
 
-#

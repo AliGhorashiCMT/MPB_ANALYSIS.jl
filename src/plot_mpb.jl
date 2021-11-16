@@ -1,3 +1,7 @@
+"""
+This function plots the dispersion from an output file from MPB that has been obtained through 
+mpb filename.ctl > filename.out 
+"""
 function plot_mpb(filename::AbstractString, mode::AbstractString, plotorno::Bool=true; kwargs...)
     Bands = Vector{Vector{Float64}}()
     for line in readlines(filename)
@@ -19,10 +23,15 @@ function plot_mpb(filename::AbstractString, mode::AbstractString, plotorno::Bool
     return reshapedBands
 end
 
-function plot_dispersion(filename::AbstractString)
+"""
+This function plots the dispersion from an output MPB file that has been obtained through culling lines that include frequency information.
+"""
+function plot_dispersion(filename::AbstractString; kwargs...)
     bands = readdlm(filename, ',')[:, 6:end]
-    bands_plot = plot(bands, legend=false, linewidth=5)
-    title!(filename, titlefontsize=20)
+    plot(bands, linewidth=4, color="green", kwargs...)
+    title(filename)
+    xticks([])
+    ylabel("Frequency")
 end
 
 function plot_bothmodes(filename::AbstractString; kwargs...)

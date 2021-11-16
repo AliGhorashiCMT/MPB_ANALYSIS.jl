@@ -20,7 +20,7 @@ function plot_topologybands(filename::AbstractString, highsymmetrylabels::Array{
     for (highsymmetrylabel, highsymmetryxcoord) in zip(highsymmetrylabels, highsymmetryxcoords)
         irlabels = String.(split(replace(replace(highsymmetrylabel, "+" => " "), "," =>" ")        ))
         for (energy, irreps) in zip(Bands[highsymmetryxcoord], irlabels)
-            display(annotate!(highsymmetryxcoord, energy, text(irreps, 10)))
+            text(highsymmetryxcoord, energy, irreps, 10)
         end
     end
 end
@@ -43,28 +43,34 @@ end
 
 """
 $(TYPEDSIGNATURES)
-
 Plots MPB bands and overlays both the irreps and the topological nature of the bands by denoting the color.
 """
 function plot_topologybands(sgnum::Integer, id::Integer, runtype::AbstractString; dim::Integer=2, 
-    res::Integer=32, dispersiondir::String="./", symeigdir::AbstractString="./", labeltopology::Bool=false, verbose::Bool=false, kwargs...)
+    res::Integer=32, dispersiondir::String="./", symeigdir::AbstractString="./", verbose::Bool=false, kwargs...)
     whichtopologiesVEC = Symbol[] #A vector of symbols denoting the colors of each bands (corresponding to their topological classfication)
-    dispersion_filename = mpb_calcname(dim, sgnum, id, res, runtype)*"-dispersion.out" 
+    
     calcname = mpb_calcname(dim, sgnum, id, res, runtype)
+    dispersion_filename = calcname*"-dispersion.out" 
+    
     athighsymmetry = Vector{Integer}() #A vector of indices that will correspond to the points in k space corresponding to high symmetry k points
     highsymmetrykvecs = bandreps(sgnum, dim).kvs #High symmetry kvectors
     highsymmetryklabs = bandreps(sgnum, dim).klabs #And their corresponding labels
+    
     xticks = Vector{Integer}()
     xticklabels = Vector{String}()
+    
     Bands = Vector{Vector{Float64}}()
     Frag, Nontop, Top, Unknown = :Red, :Blue, :Black, :Pink 
     println("Coloring scheme is: ", "Fragile: $(string(Frag)),  Nontopological: $(string(Nontop)),  Topological: $(string(Top)), and Unknown: $(string(Unknown))\n\n")
+    
     whichtopologies = label_topologies(mpb_calcname(dim, sgnum, id, res, runtype), true, symeigdir, verbose=verbose)
     verbose && println(whichtopologies...)
+    
     for (index, line) in enumerate(readlines(dispersiondir*dispersion_filename))
         push!(Bands, parsebands(line))
         sum([isapprox(parsekvec(line, dim), highsymmetrykvec.cnst, atol=1e-3) for highsymmetrykvec in highsymmetrykvecs]) == 1 && push!(athighsymmetry, index )
     end
+    
     for (i, _) in enumerate(first(Bands))
         ind = findfirst(x-> i in first(x), whichtopologies)
         isnothing(ind) && (push!(whichtopologiesVEC, Unknown); continue)
@@ -75,15 +81,15 @@ function plot_topologybands(sgnum::Integer, id::Integer, runtype::AbstractString
     reshapedBands = zeros(length(Bands), length(first(Bands)))
     reshapedBandscolors = Array{Symbol, 2}(undef, (length(Bands), length(first(Bands))))
     for (i, b) in enumerate(Bands)
-        reshapedBands[i, :] = b ##Note that each row now corresponds to a point in reciprocal space, as desired
+        reshapedBands[i, :] = b #Note that each row now corresponds to a point in reciprocal space, as desired
         reshapedBandscolors[i, :] = whichtopologiesVEC
     end
-    bandsplot = Plots.plot(reshapedBands, color=reshapedBandscolors, linewidth=5, legend=false,  size=(500, 1000), xtickfontsize=20; kwargs...)
+    plot(reshapedBands, color=reshapedBandscolors, linewidth=5, legend=false; kwargs...)
     for (index, line) in enumerate(readlines(dispersiondir*dispersion_filename))
         lab = index in athighsymmetry ? highsymmetryklabs[findfirst(x -> isapprox(x.cnst, parsekvec(line, dim), atol=1e-3), highsymmetrykvecs )] : nothing
         !isnothing(lab) && (push!(xticks, index); push!(xticklabels, lab)) 
     end
-    xticks!(xticks, xticklabels)
+    xticks(xticks, xticklabels)
     has_tr = true
     bandirsd, lgirsd =  runtype == "tm" ? extract_individual_multiplicities(calcname, timereversal=has_tr, dir = symeigdir, atol=2e-2) : extract_individual_multiplicities(calcname, timereversal=has_tr, latestarts = Dict{String, Int}(), dir = symeigdir,atol=2e-2)
     runtype == "tm" && pushfirst!(bandirsd["Γ"], 1:1=>[1, zeros(length(realify(get_lgirreps(sgnum, dim)["Γ"]))-1)...])
@@ -96,13 +102,12 @@ function plot_topologybands(sgnum::Integer, id::Integer, runtype::AbstractString
             whichgrouping = findfirst(x -> i in x.first, groupings)
             try
                 bandlabel = groupings[whichgrouping].second
-                annotate!(tick, energy, text(bandlabel, 15))
+                text(tick, energy, bandlabel)
             catch
             end
         end
     end    
-    title!("Spacegroup $(sgnum) Type: $(runtype) ID: $(id)", titlefontsize=20)
-    display(bandsplot)
+    title("Spacegroup $(sgnum) Type: $(runtype) ID: $(id)", titlefontsize=20)
 end
 
 function plot_topologybands(filename::AbstractString, highsymmetrylabels::AbstractString)
