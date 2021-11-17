@@ -1,14 +1,14 @@
-
-
 function decompose_bandset(calcname::AbstractString, runtype::AbstractString, bandrange::UnitRange{Int64}; has_tr::Bool=true, dir="./")
     sgnum = parse_sgnum(calcname)
     dim = parse_dim(calcname)
-    brs = bandreps(sgnum, dim)
+    sb, brs = compatibility_basis(sgnum, dim)
+    B = matrix(brs)
+    F = smith(B)
+
     bandirsd, lgirsd =  runtype == "tm" ? extract_individual_multiplicities(calcname, timereversal=has_tr, dir = gdir, atol=2e-2) : extract_individual_multiplicities(calcname, timereversal=has_tr, latestarts = Dict{String, Int}(), dir = dir,atol=2e-2)
     runtype == "tm" && pushfirst!(bandirsd["Γ"], 1:1=>[1, zeros(length(realify(get_lgirreps(sgnum, dim)["Γ"]))-1)...])
     totaln=zeros(0)
     for (b, l) in zip(bandirsd, lgirsd)
-        println(b)
         natkpoint=zeros(length(l[2]))
         for (bands, n) in b[2]
             minimum(bands) >= minimum(bandrange) || continue
@@ -18,6 +18,7 @@ function decompose_bandset(calcname::AbstractString, runtype::AbstractString, ba
         totaln = vcat(totaln, natkpoint)
     end
     totaln = vcat(totaln, length(bandrange))
+    !isbandstruct(Int.(totaln), F) && error("You did not provide a valid band range")
     return decompose(Int.(totaln), brs)
 end
 
