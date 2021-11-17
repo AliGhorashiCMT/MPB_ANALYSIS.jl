@@ -3,6 +3,7 @@ This function plots the dispersion from an output file from MPB that has been ob
 mpb filename.ctl > filename.out 
 """
 function plot_mpb(filename::AbstractString, mode::AbstractString, plotorno::Bool=true; kwargs...)
+    println("here here here")
     Bands = Vector{Vector{Float64}}()
     for line in readlines(filename)
         contains(line, "k index") && continue

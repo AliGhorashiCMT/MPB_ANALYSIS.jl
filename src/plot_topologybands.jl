@@ -48,7 +48,7 @@ Plots MPB bands and overlays both the irreps and the topological nature of the b
 function plot_topologybands(sgnum::Integer, id::Integer, runtype::AbstractString; dim::Integer=2, 
     res::Integer=32, dispersiondir::String="./", symeigdir::AbstractString="./", verbose::Bool=false, kwargs...)
     whichtopologiesVEC = Symbol[] #A vector of symbols denoting the colors of each bands (corresponding to their topological classfication)
-    
+
     calcname = mpb_calcname(dim, sgnum, id, res, runtype)
     dispersion_filename = calcname*"-dispersion.out" 
     
@@ -62,8 +62,8 @@ function plot_topologybands(sgnum::Integer, id::Integer, runtype::AbstractString
     Bands = Vector{Vector{Float64}}()
     Frag, Nontop, Top, Unknown = :Red, :Blue, :Black, :Pink 
     println("Coloring scheme is: ", "Fragile: $(string(Frag)),  Nontopological: $(string(Nontop)),  Topological: $(string(Top)), and Unknown: $(string(Unknown))\n\n")
-    
-    whichtopologies = label_topologies(mpb_calcname(dim, sgnum, id, res, runtype), true, symeigdir, verbose=verbose)
+
+    whichtopologies = label_topologies(calcname, true, symeigdir, verbose=verbose)
     verbose && println(whichtopologies...)
     
     for (index, line) in enumerate(readlines(dispersiondir*dispersion_filename))
@@ -79,17 +79,18 @@ function plot_topologybands(sgnum::Integer, id::Integer, runtype::AbstractString
         (whichtopologies[ind][2] == FRAGILE) && (push!(whichtopologiesVEC, Frag); continue)
     end
     reshapedBands = zeros(length(Bands), length(first(Bands)))
-    reshapedBandscolors = Array{Symbol, 2}(undef, (length(Bands), length(first(Bands))))
     for (i, b) in enumerate(Bands)
         reshapedBands[i, :] = b #Note that each row now corresponds to a point in reciprocal space, as desired
-        reshapedBandscolors[i, :] = whichtopologiesVEC
     end
-    plot(reshapedBands, color=reshapedBandscolors, linewidth=5, legend=false; kwargs...)
+    for (c, b) in zip(whichtopologiesVEC, eachcol(reshapedBands))
+        plot(b, color=c)
+    end
+    
     for (index, line) in enumerate(readlines(dispersiondir*dispersion_filename))
         lab = index in athighsymmetry ? highsymmetryklabs[findfirst(x -> isapprox(x.cnst, parsekvec(line, dim), atol=1e-3), highsymmetrykvecs )] : nothing
         !isnothing(lab) && (push!(xticks, index); push!(xticklabels, lab)) 
     end
-    xticks(xticks, xticklabels)
+    PyPlot.xticks(xticks .- 1, xticklabels)
     has_tr = true
     bandirsd, lgirsd =  runtype == "tm" ? extract_individual_multiplicities(calcname, timereversal=has_tr, dir = symeigdir, atol=2e-2) : extract_individual_multiplicities(calcname, timereversal=has_tr, latestarts = Dict{String, Int}(), dir = symeigdir,atol=2e-2)
     runtype == "tm" && pushfirst!(bandirsd["Γ"], 1:1=>[1, zeros(length(realify(get_lgirreps(sgnum, dim)["Γ"]))-1)...])
@@ -107,7 +108,7 @@ function plot_topologybands(sgnum::Integer, id::Integer, runtype::AbstractString
             end
         end
     end    
-    title("Spacegroup $(sgnum) Type: $(runtype) ID: $(id)", titlefontsize=20)
+    title("Spacegroup $(sgnum) Type: $(runtype) ID: $(id)")
 end
 
 function plot_topologybands(filename::AbstractString, highsymmetrylabels::AbstractString)
