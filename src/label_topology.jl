@@ -5,7 +5,7 @@ function decompose_bandset(calcname::AbstractString, runtype::AbstractString, ba
     B = matrix(brs)
     F = smith(B)
 
-    bandirsd, lgirsd =  runtype == "tm" ? extract_individual_multiplicities(calcname, timereversal=has_tr, dir = gdir, atol=2e-2) : extract_individual_multiplicities(calcname, timereversal=has_tr, latestarts = Dict{String, Int}(), dir = dir,atol=2e-2)
+    bandirsd, lgirsd =  runtype == "tm" ? extract_individual_multiplicities(calcname, timereversal=has_tr, dir = dir, atol=2e-2) : extract_individual_multiplicities(calcname, timereversal=has_tr, latestarts = Dict{String, Int}(), dir = dir,atol=2e-2)
     runtype == "tm" && pushfirst!(bandirsd["Γ"], 1:1=>[1, zeros(length(realify(get_lgirreps(sgnum, dim)["Γ"]))-1)...])
     totaln=zeros(0)
     for (b, l) in zip(bandirsd, lgirsd)
